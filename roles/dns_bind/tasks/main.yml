@@ -1,0 +1,78 @@
+- name: Install BIND and utilities
+  ansible.builtin.package:
+    name:
+      - bind
+      - bind-utils
+    state: present
+
+- name: Create zones directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ bind_zones_dir }}"
+    state: directory
+    owner: root
+    group: named
+    mode: "0750"
+
+- name: Deploy named.conf
+  ansible.builtin.template:
+    src: named.conf.j2
+    dest: "{{ named_conf_path }}"
+    owner: root
+    group: named
+    mode: "0640"
+    validate: "named-checkconf %s"
+  notify: Reload named
+
+- name: Deploy forward zone
+  ansible.builtin.template:
+    src: zone.forward.j2
+    dest: "{{ zone_forward_file }}"
+    owner: root
+    group: named
+    mode: "0640"
+  notify: Reload named
+
+- name: Deploy reverse zone
+  ansible.builtin.template:
+    src: zone.reverse.j2
+    dest: "{{ zone_reverse_file }}"
+    owner: root
+    group: named
+    mode: "0640"
+  notify: Reload named
+
+- name: Validate named.conf (named-checkconf)
+  ansible.builtin.command: "named-checkconf {{ named_conf_path }}"
+  changed_when: false
+  register: named_checkconf_result
+
+- name: Validate forward zone (named-checkzone)
+  ansible.builtin.command: "named-checkzone {{ domain_name }} {{ zone_forward_file }}"
+  changed_when: false
+  register: named_checkzone_forward_result
+
+- name: Validate reverse zone (named-checkzone)
+  ansible.builtin.command: "named-checkzone {{ reverse_zone }} {{ zone_reverse_file }}"
+  changed_when: false
+  register: named_checkzone_reverse_result
+
+- name: Open DNS ports (53/tcp, 53/udp) in firewalld
+  ansible.posix.firewalld:
+    service: dns
+    permanent: true
+    inmediate: true
+    state: enabled
+  when: manage_firewalld
+  notify: Reload firewalld
+
+- name: Restore SELinux context in the zones directory (operative annotation/note)
+  ansible.builtin.command: "restorecon -Rv {{ bind_zones_dir }}"
+  register: restorecon_zones
+  changed_when: "'Relabeled' in restorecon_zones.stdout"
+  when: ansible_selinux is defined and ansible_selinux.status == "enabled"
+
+- name: Enable and start named
+  ansible.builtin.service:
+    name: named
+    state: started
+    enabled: true

@@ -1,0 +1,26 @@
+domain_name: "danielacastmor.local"
+dns_server_hostname: "dns1"
+dns_server_ip: "192.168.56.109"
+reverse_zone: "56.168.192.in-addr.arpa" # Corresponse a 192.168.56.0/24
+
+dns_forwarders_enabled: true
+dns_forwarders: []
+
+dns_recursion: true
+dns_allow_query:
+  - "any"
+dns_listen_on:
+  - "any"
+
+dns_serial: "2026090801"
+
+dns_records_a: []
+dns_records_ptr: []
+
+bind_conf_dir: /etc/named
+bind_zones_dir: /var/named
+named_conf_path: /etc/named.conf
+zone_forward_file: "{{ bind_zones_dir }}/{{ domain_name }}.zone"
+zone_reverse_file: "{{ bind_zones_dir }}/{{ reverse_zone }}.zone"
+
+manage_firewalld: true

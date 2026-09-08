@@ -1,0 +1,8 @@
+- name: Configuring DNS (BIND) and DHCP Servers on Rocky Linux 9
+  hosts: dns_dhcp_servers
+  become: true
+  gather_facts: true
+
+  roles: 
+    - dns_bind
+    - dhcpd

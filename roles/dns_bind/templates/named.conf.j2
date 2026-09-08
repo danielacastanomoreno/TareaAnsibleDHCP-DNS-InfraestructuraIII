@@ -1,0 +1,20 @@
+// Managed by Ansible - Do NOT edit manually
+// Generated from: roles/dns_bind/templates/named.conf.j2
+
+options {
+    listen-on port 53 { {{  dns_listen_on | join('; ') }}; };
+    listen-on-v6 port 53 { none; };
+    directory           "{{ bind_zones_dir }}";
+    dump-file           "/var/named/data/cache_dump.db";
+    statistics-file     "/var/named/data/named_stats.txt";
+    memstatistic-file   "/var/named/data/named_mem_stats.txt";
+    recursing-file      "/var/named/data//named.recursing";
+    secroots-file       "/var/named/data/named.secroots";
+    allow-query         { {{  dns_allow_query | join('; ') }}; };
+
+    recursion {{ 'yes' if dns_recursion else 'no' }};
+
+{% if dns_forwarders_enabled and dns_forwarders | length > 0 %}
+
+
+}
