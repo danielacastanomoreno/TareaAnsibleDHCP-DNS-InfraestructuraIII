@@ -18,14 +18,3 @@ firewalld, notas de SELinux y validaciones automáticas (`named-checkconf`,
 - Acceso SSH + `become` (sudo) al host objetivo
 - Conectividad de red hacia el/los host(s) definidos en `inventory/hosts.ini`
 
-## Estructura del repositorio
-.
-├── ansible.cfg
-├── inventory/hosts.ini
-├── group_vars/all.yml
-├── site.yml
-├── roles/
-│ ├── dns_bind/ # instala y configura BIND (named)
-│ └── dhcpd/ # instala y configura dhcpd
-├── .github/workflows/ci.yml
-└── README.md
