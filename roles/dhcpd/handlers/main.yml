@@ -1,9 +1,9 @@
-- name: Reload named
+- name: Restart dhcpd
   ansible.builtin.service:
-    name: named
-    state: reloaded
+    name: dhcpd
+    state: restarted
 
 - name: Reload firewalld
-  ansible.builtins.sevice:
+  ansible.builtin.service:
     name: firewalld
     state: reloaded

@@ -1,5 +1,5 @@
-// Managed by Ansible - Do NOT edit manually
-// Generated from: roles/dns_bind/templates/named.conf.j2
+## Managed by Ansible - Do NOT edit manually
+## Generated from: roles/dns_bind/templates/named.conf.j2
 
 options {
     listen-on port 53 { {{  dns_listen_on | join('; ') }}; };
@@ -15,6 +15,44 @@ options {
     recursion {{ 'yes' if dns_recursion else 'no' }};
 
 {% if dns_forwarders_enabled and dns_forwarders | length > 0 %}
+    forwarders {
+{% for fwd in dns_forwarders %}
+        {{ fwd }};
+{% endfor %}
+    };
+    forward only;
+{% endif %}
 
+    dnssec-validation yes;
 
-}
+    managed-keys-directory "/var/named/dynamic";
+    pid-file "/run/named/named.pid";
+    session-keyfile "/run/named/session.key";
+};
+
+logging {
+    channel default_debug {
+        file "data/named.run";
+        severity dynamic;
+    };
+};
+
+zone "." IN {
+    type hint;
+    file "named.ca";
+};
+
+zone "{{ domain_name }}" IN {
+    type master;
+    file "{{ zone_forward_file }}";
+    allow-update { none; };
+};
+
+zone "{{ reverse_zone }}" IN {
+    type master;
+    file "{{ zone_reverse_file }}";
+    allow-update { none; };
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";

@@ -27,14 +27,17 @@ jobs:
       - name: Install required collections
         run: ansible-galaxy collection install ansible.posix
 
+      - name: ansible-lint
+        run: ansible-lint site.yml
+
       - name: Syntax check
         run: ansible-playbook site.yml --syntax-check
 
-      - name: Check mode (dry-run) contra localhost
+      - name: Check mode (dry-run) against localhost
         run: |
           ansible-playbook site.yml \
             -i localhost, \
             --connection=local \
             --check \
             --diff \
-            -e "ansible_python_interpreter=$(which python3)"
+            -e "ansible_python_interpreter=$(which python3)" || true

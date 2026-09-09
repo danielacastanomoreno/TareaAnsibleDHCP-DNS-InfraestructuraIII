@@ -1,0 +1,13 @@
+$TTL 86400
+@   IN SOA {{ dns_server_hostname }}.{{ domain_name }}. admin.{{ domain_name }}. (
+                {{ dns_serial }} ; Serial
+                3600       ; Refresh
+                1800       ; Retry
+                604800     ; Expire
+                86400 )    ; Minimum TTL
+
+    IN NS   {{ dns_server_hostname }}.{{ domain_name }}.
+
+{% for record in dns_records_ptr %}
+{{ record.ip_last_octet }}    IN PTR    {{ record.hostname }}.{{ domain_name }}.
+{% endfor %}
