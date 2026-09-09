@@ -1,0 +1,42 @@
+---
+# Evita el problema clásico de "DHCP rogue": si esta VM tenía named/dhcpd
+# corriendo antes (porque era uno de los dos servidores originales),
+# hay que apagarlos antes de que el nuevo servidor consolidado reparta IPs.
+- name: Detener y deshabilitar named si estaba presente en esta VM
+  ansible.builtin.service:
+    name: named
+    state: stopped
+    enabled: false
+  when: disable_local_server_services | bool
+  failed_when: false
+
+- name: Detener y deshabilitar dhcpd si estaba presente en esta VM
+  ansible.builtin.service:
+    name: dhcpd
+    state: stopped
+    enabled: false
+  when: disable_local_server_services | bool
+  failed_when: false
+
+# Requiere: ansible-galaxy collection install community.general
+- name: Cambiar la conexión de red de IP estática a DHCP (method=auto)
+  community.general.nmcli:
+    conn_name: "{{ client_interface }}"
+    ifname: "{{ client_interface }}"
+    type: ethernet
+    method4: auto
+    method6: disabled
+    state: present
+  notify: reactivar conexion de red
+
+- name: Verificar que la interfaz ya no tiene IP fija asignada manualmente
+  ansible.builtin.command: "nmcli -g ipv4.method connection show {{ client_interface }}"
+  register: nmcli_method
+  changed_when: false
+
+- name: Confirmar método DHCP aplicado
+  ansible.builtin.assert:
+    that:
+      - "'auto' in nmcli_method.stdout"
+    fail_msg: "La conexión {{ client_interface }} sigue en modo estático."
+    success_msg: "Conexión {{ client_interface }} en modo DHCP (auto)."

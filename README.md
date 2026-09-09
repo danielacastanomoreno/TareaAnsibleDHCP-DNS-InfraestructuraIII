@@ -195,3 +195,81 @@ sudo dhcpd -t -cf /etc/dhcp/dhcpd.conf
 sudo systemctl status named dhcpd
 sudo ss -lntup | grep -E ':53|:67'
 sudo firewall-cmd --list-services
+
+
+
+---
+
+# DHCP + DNS consolidado en Rocky Linux 9
+
+Playbook de Ansible idempotente que instala y configura **DNS (BIND/named)**
+y **DHCP (dhcpd)** en una única VM (`192.168.56.107`, dominio
+`dhcpdnsdaniela.castanomor.local`) y convierte la segunda VM en **cliente DHCP**.
+
+## Requisitos
+
+```bash
+ansible-galaxy collection install ansible.posix community.general
+```
+
+- Rocky Linux 9 en ambos hosts
+- Ansible >= 2.14
+- Acceso SSH + sudo
+
+## Escenario
+
+- **`dnsdhcp01` (192.168.56.107)**: corre `named` + `dhcpd` a la vez.
+- **`client1`**: pierde cualquier rol de servidor que tuviera antes
+  (se detienen/deshabilitan `named`/`dhcpd` si existían) y pasa a obtener
+  su IP por DHCP.
+
+## ⚠️ Sobre la IP estática del cliente y el DHCP
+
+Si `client1` tiene hoy una IP fija configurada (`ipv4.method=manual` en
+NetworkManager), **no va a empezar a usar DHCP solo porque el servidor ya
+esté funcionando** — hay que cambiar explícitamente su perfil de conexión a
+`method=auto`. Eso lo hace el rol `dhcp_client` con `community.general.nmcli`.
+
+Dos riesgos a evitar:
+
+1. **Colisión de IP**: si la IP estática actual del cliente cae dentro del
+   `range` del `dhcpd.conf`, el servidor podría ofrecérsela a otra máquina
+   más adelante. Por eso esa IP está **reservada por MAC** en
+   `dhcp_reservations` (ajusta la MAC real en `group_vars/all.yml`).
+2. **DHCP duplicado ("rogue")**: si `client1` era antes uno de los dos
+   servidores originales y tenía `dhcpd` activo, debe quedar apagado
+   (lo hace este rol) para que solo `dnsdhcp01` responda en la red.
+
+Tras aplicar el playbook, verifica que el inventario (`ansible_host` de
+`client1`) sigue siendo válido: como está reservado por MAC, debería
+recibir siempre la misma IP.
+
+## Selección de interfaz DHCP en Rocky 9
+
+Si `dhcp_interface` queda vacío, el rol autodetecta la interfaz con
+`ansible_default_ipv4.interface` y la escribe en `/etc/sysconfig/dhcpd`
+(`DHCPDARGS="<interfaz>"`), mecanismo leído por la unidad systemd
+`dhcpd.service` en RHEL/Rocky 9. Puedes forzarla con `dhcp_interface: "ens192"`.
+
+## SELinux
+
+No se deshabilita. Los paquetes `bind` y `dhcp-server` traen políticas que
+ya cubren sus puertos estándar (`named_port_t` 53, `dhcpd_port_t` 67). Se
+ejecuta `restorecon -Rv /var/named` tras desplegar zonas.
+
+## Uso
+
+```bash
+ansible-playbook site.yml --syntax-check
+ansible-playbook site.yml --check --diff
+ansible-playbook site.yml
+```
+
+## Idempotencia
+
+- Módulos declarativos (`package`, `template`, `service`, `lineinfile`,
+  `firewalld`, `nmcli`).
+- Los únicos `command`/`ansible.builtin.command` son de **validación**
+  (`named-checkconf`, `named-checkzone`, `dhcpd -t`, `restorecon`, `nmcli ...show`),
+  todos con `changed_when: false` o comparación explícita de salida.
+- Los `handlers` solo disparan si cambian plantillas o la conexión de red.

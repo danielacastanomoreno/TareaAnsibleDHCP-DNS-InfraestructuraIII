@@ -1,78 +1,71 @@
 ---
-- name: Install BIND and utilities
+- name: Instalar BIND y utilidades
   ansible.builtin.package:
     name:
       - bind
       - bind-utils
     state: present
 
-- name: Create zones directory if it does not exist
-  ansible.builtin.file:
-    path: "{{ bind_zones_dir }}"
-    state: directory
-    owner: root
-    group: named
-    mode: "0750"
-
-- name: Deploy named.conf
+- name: Desplegar named.conf (validado al escribir)
   ansible.builtin.template:
     src: named.conf.j2
-    dest: "{{ named_conf_path }}"
+    dest: /etc/named.conf
     owner: root
     group: named
     mode: "0640"
     validate: "named-checkconf %s"
-  notify: Reload named
+  notify: reload named
 
-- name: Deploy forward zone
+- name: Desplegar zona forward
   ansible.builtin.template:
     src: zone.forward.j2
-    dest: "{{ zone_forward_file }}"
+    dest: "/var/named/{{ domain_name }}.zone"
     owner: root
     group: named
     mode: "0640"
-  notify: Reload named
+  notify: reload named
 
-- name: Deploy reverse zone
+- name: Desplegar zona reverse
   ansible.builtin.template:
     src: zone.reverse.j2
-    dest: "{{ zone_reverse_file }}"
+    dest: "/var/named/{{ reverse_zone }}.zone"
     owner: root
     group: named
     mode: "0640"
-  notify: Reload named
+  notify: reload named
 
-- name: Validate named.conf (named-checkconf)
-  ansible.builtin.command: "dns_bind_named-checkconf {{ named_conf_path }}"
+- name: Validar named.conf (post-check explícito)
+  ansible.builtin.command: named-checkconf /etc/named.conf
   changed_when: false
-  register: dns_bind_named_checkconf_result
 
-- name: Validate forward zone (named-checkzone)
-  ansible.builtin.command: "dns_bind_named-checkzone {{ domain_name }} {{ zone_forward_file }}"
+- name: Validar zona forward
+  ansible.builtin.command: "named-checkzone {{ domain_name }} /var/named/{{ domain_name }}.zone"
   changed_when: false
-  register: dns_bind_named_checkzone_forward_result
 
-- name: Validate reverse zone (named-checkzone)
-  ansible.builtin.command: "dns_bind_named-checkzone {{ reverse_zone }} {{ zone_reverse_file }}"
+- name: Validar zona reverse
+  ansible.builtin.command: "named-checkzone {{ reverse_zone }} /var/named/{{ reverse_zone }}.zone"
   changed_when: false
-  register: dns_bind_named_checkzone_reverse_result
 
-- name: Open DNS ports in firewalld (53/tcp, 53/udp) 
+- name: Comprobar estado de SELinux
+  ansible.builtin.command: getenforce
+  register: selinux_status
+  changed_when: false
+  check_mode: false
+
+- name: Restaurar contexto SELinux en /var/named
+  ansible.builtin.command: restorecon -Rv /var/named
+  changed_when: false
+  when: "'Disabled' not in selinux_status.stdout"
+
+- name: Abrir servicio DNS en firewalld
   ansible.posix.firewalld:
     service: dns
     permanent: true
-    inmediate: true
+    immediate: true
     state: enabled
-  when: manage_firewalld
-  notify: Reload firewalld
+  when: manage_firewalld | bool
 
-- name: Restore SELinux context in the zones directory (operative annotation/note)
-  ansible.builtin.command: "dns_bind_restorecon -Rv {{ bind_zones_dir }}"
-  register: dns_bind_restorecon_zones
-  changed_when: "'Relabeled' in restorecon_zones.stdout"
-  when: ansible_selinux is defined and ansible_selinux.status == "enabled"
-
-- name: Enable and start named
+- name: Habilitar e iniciar named
   ansible.builtin.service:
     name: named
     state: started

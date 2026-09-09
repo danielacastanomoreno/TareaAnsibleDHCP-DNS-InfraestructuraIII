@@ -1,33 +1,13 @@
-## Managed by Ansible - Do NOT edit manually
-## Generated from: roles/dns_bind/templates/named.conf.j2
-
 options {
-    listen-on port 53 { {{  dns_listen_on | join('; ') }}; };
+    listen-on port 53 { {{ dns_listen_on | join('; ') }}; };
     listen-on-v6 port 53 { none; };
-    directory           "{{ bind_zones_dir }}";
-    dump-file           "/var/named/data/cache_dump.db";
-    statistics-file     "/var/named/data/named_stats.txt";
-    memstatistic-file   "/var/named/data/named_mem_stats.txt";
-    recursing-file      "/var/named/data//named.recursing";
-    secroots-file       "/var/named/data/named.secroots";
-    allow-query         { {{  dns_allow_query | join('; ') }}; };
-
+    directory       "/var/named";
+    allow-query     { {{ dns_allow_query | join('; ') }}; };
     recursion {{ 'yes' if dns_recursion else 'no' }};
-
-{% if dns_forwarders_enabled and dns_forwarders | length > 0 %}
-    forwarders {
-{% for fwd in dns_forwarders %}
-        {{ fwd }};
-{% endfor %}
-    };
-    forward only;
+{% if dns_forwarders_enabled %}
+    forwarders { {{ dns_forwarders | join('; ') }}; };
 {% endif %}
-
-    dnssec-validation yes;
-
-    managed-keys-directory "/var/named/dynamic";
-    pid-file "/run/named/named.pid";
-    session-keyfile "/run/named/session.key";
+    dnssec-validation auto;
 };
 
 logging {
@@ -44,15 +24,14 @@ zone "." IN {
 
 zone "{{ domain_name }}" IN {
     type master;
-    file "{{ zone_forward_file }}";
+    file "{{ domain_name }}.zone";
     allow-update { none; };
 };
 
 zone "{{ reverse_zone }}" IN {
     type master;
-    file "{{ zone_reverse_file }}";
+    file "{{ reverse_zone }}.zone";
     allow-update { none; };
 };
 
 include "/etc/named.rfc1912.zones";
-include "/etc/named.root.key";

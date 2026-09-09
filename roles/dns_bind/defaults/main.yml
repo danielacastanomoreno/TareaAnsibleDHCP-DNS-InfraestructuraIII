@@ -1,25 +1,14 @@
 ---
-dns_bind_domain_name: "castanomor.local"
-dns_bind_server_hostname: "dnsdaniela"
-dns_bind_server_ip: "192.168.56.109"
-dns_bind_reverse_zone: "56.168.192.in-addr.arpa" # Corresponse a 192.168.56.0/24
-
-dns_bind_package: bind
-dns_bind_utils_package: bind-utils
-
-named_conf_path: /etc/named.conf
-named_zones_dir: /var/named
-named_service: named
-
-dns_bind_forwarders_enabled: true
-dns_bind_forwarders: []
-dns_bind_recursion: true
-dns_bind_allow_query:
-  - "any"
-dns_bind_listen_on:
-  - "any"
-
-dns_bind_serial: "2026090801"
-dns_bind_records_a: []
-firewall_enabled: true
-selinux_manage: true
+domain_name: castanomor.local
+dns_server_hostname: dhcpdnsdaniela
+dns_server_ip: 192.168.56.107
+reverse_zone: 56.168.192.in-addr.arpa
+dns_forwarders_enabled: true
+dns_forwarders: [8.8.8.8, 1.1.1.1]
+dns_recursion: true
+dns_allow_query: ["any"]
+dns_listen_on: ["any"]
+dns_serial: 2026090901
+dns_records_a: []
+dns_records_ptr: []
+manage_firewalld: true

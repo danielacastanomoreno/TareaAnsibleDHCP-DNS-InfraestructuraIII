@@ -1,7 +1,4 @@
-{# Managed by Ansible - Do NOT edit manually #} 
-{# Generated from: roles/dns_bind/templates/named.conf.j2 #}
-
-{{ 'authoritative;' if dhcp_authoritative else '' }}
+authoritative;
 
 default-lease-time {{ dhcp_default_lease_time }};
 max-lease-time {{ dhcp_max_lease_time }};
@@ -14,13 +11,9 @@ subnet {{ subnet.network }} netmask {{ subnet.netmask }} {
     range {{ subnet.range_start }} {{ subnet.range_end }};
     option routers {{ subnet.routers }};
     option broadcast-address {{ subnet.broadcast }};
-    option domain-name-servers {{ subnet.domain_name_servers | default(dhcp_domain_name_servers | join(', ')) }};
-    option domain-name "{{ dhcp_domain_name }}";
-    default-lease-time {{ dhcp_default_lease_time }};
-    max-lease-time {{ dhcp_max_lease_time }};
 }
-
 {% endfor %}
+
 {% for host in dhcp_reservations %}
 host {{ host.name }} {
     hardware ethernet {{ host.mac }};

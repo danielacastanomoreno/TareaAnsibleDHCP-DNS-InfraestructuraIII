@@ -1,14 +1,13 @@
 ---
-- name: Configuring DNS server (BIND/named) on Rocky Linux 9
-  hosts: dns_servers
+- name: Configurar servidor DNS + DHCP consolidado (Rocky 9)
+  hosts: dns_dhcp_servers
   become: true
-  gather_facts: true
   roles:
     - dns_bind
-
-- name: Configuring DHCP server (dhcpd) on Rocky Linux 9
-  hosts: dhcp_servers
-  become: true
-  gather_facts: true
-  roles:
     - dhcpd
+
+- name: Convertir la VM restante en cliente DHCP (Rocky 9)
+  hosts: dhcp_clients
+  become: true
+  roles:
+    - dhcp_client

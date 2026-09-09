@@ -1,50 +1,46 @@
 ---
-- name: Install dhcp-server
+- name: Instalar dhcp-server
   ansible.builtin.package:
     name: dhcp-server
     state: present
 
-- name: Determine effective DHCP interface
+- name: Determinar interfaz DHCP efectiva
   ansible.builtin.set_fact:
-    dhcpd_interface_effective: >-
-      {{ dhcp_interface if (dhcp_interface | default('') | length > 0)
-         else ansible_default_ipv4.interface }}
+    dhcp_interface_effective: "{{ dhcp_interface if (dhcp_interface | length > 0) else ansible_default_ipv4.interface }}"
 
-- name: Deploy dhcpd.conf
-  ansible.builtin.template:
-    src: dhcpd.conf.j2
-    dest: "{{ dhcp_conf_path }}"
-    owner: root
-    group: root
-    mode: "0644"
-  notify: Restart dhcpd
-
-- name: Validate dhcpd.conf syntax (dhcpd -t)
-  ansible.builtin.command: "dhcpd -t -cf {{ dhcp_conf_path }}"
-  changed_when: false
-  register: dhcpd_check_result
-
-- name: Fijar interfaz de escucha de dhcpd (sysconfig)
+- name: Fijar interfaz en /etc/sysconfig/dhcpd (mecanismo soportado por dhcpd.service en RHEL9)
   ansible.builtin.lineinfile:
-    path: "{{ dhcp_sysconfig_path }}"
-    regexp: "^DHCPDARGS="
+    path: /etc/sysconfig/dhcpd
+    regexp: '^DHCPDARGS='
     line: 'DHCPDARGS="{{ dhcp_interface_effective }}"'
     create: true
     owner: root
     group: root
     mode: "0644"
-  notify: Restart dhcpd
+  notify: restart dhcpd
 
-- name: Open DHCP port (67/udp) in firewalld
+- name: Desplegar dhcpd.conf
+  ansible.builtin.template:
+    src: dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart dhcpd
+
+- name: Validar dhcpd.conf
+  ansible.builtin.command: dhcpd -t -cf /etc/dhcp/dhcpd.conf
+  changed_when: false
+
+- name: Abrir servicio DHCP en firewalld
   ansible.posix.firewalld:
     service: dhcp
     permanent: true
     immediate: true
     state: enabled
-  when: manage_firewalld
-  notify: Reload firewalld
+  when: manage_firewalld | bool
 
-- name: Enable and start dhcpd
+- name: Habilitar e iniciar dhcpd
   ansible.builtin.service:
     name: dhcpd
     state: started
