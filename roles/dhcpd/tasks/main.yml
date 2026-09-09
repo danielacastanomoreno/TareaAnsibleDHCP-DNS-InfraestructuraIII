@@ -1,3 +1,4 @@
+---
 - name: Install dhcp-server
   ansible.builtin.package:
     name: dhcp-server
@@ -5,7 +6,7 @@
 
 - name: Determine effective DHCP interface
   ansible.builtin.set_fact:
-    dhcp_interface_effective: >-
+    dhcpd_interface_effective: >-
       {{ dhcp_interface if (dhcp_interface | default('') | length > 0)
          else ansible_default_ipv4.interface }}
 
@@ -26,7 +27,7 @@
 - name: Fijar interfaz de escucha de dhcpd (sysconfig)
   ansible.builtin.lineinfile:
     path: "{{ dhcp_sysconfig_path }}"
-    regexp: '^DHCPDARGS='
+    regexp: "^DHCPDARGS="
     line: 'DHCPDARGS="{{ dhcp_interface_effective }}"'
     create: true
     owner: root

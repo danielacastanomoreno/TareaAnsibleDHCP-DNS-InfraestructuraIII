@@ -1,4 +1,4 @@
-
+---
 # DNS (rol dns_bind)
 domain_name: "danielacastmor.local"
 dns_server_hostname: "dns1"
@@ -36,7 +36,6 @@ dns_records_ptr:
     hostname: host1
   - ip_last_octet: 111
     hostname: host2
-
 
 # DHCP (rol dhcp)
 # If there is no defined or empty, the interface is autodetected by the role

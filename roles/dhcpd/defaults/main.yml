@@ -1,18 +1,18 @@
+---
 # If left blank, it is automatically detected using ansible_default_ipv4.interface
-dhcp_interface: ""
+dhcpd_interface: ""
 
-dhcp_domain_name: "danielacastmor.local"
-dhcp_domain_name_servers:
+dhcpd_domain_name: "danielacastmor.local"
+dhcpd_domain_name_servers:
   - "192.168.56.107"
 
-dhcp_default_lease_time: 600
-dhcp_max_lease_time: 7200
-dhcp_authoritative: true
+dhcpd_default_lease_time: 600
+dhcpd_max_lease_time: 7200
+dhcpd_authoritative: true
 
-dhcp_subnets: []
-dhcp_reservations: []
+dhcpd_subnets: []
+dhcpd_reservations: []
+dhcpd_conf_path: /etc/dhcp/dhcpd.conf
+dhcpd_sysconfig_path: /etc/sysconfig/dhcpd
 
-dhcp_conf_path: /etc/dhcp/dhcpd.conf
-dhcp_sysconfig_path: /etc/sysconfig/dhcpd
-
-manage_firewalld: true
+dhcpd_manage_firewalld: true

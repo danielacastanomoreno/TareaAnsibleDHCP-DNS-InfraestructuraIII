@@ -1,16 +1,15 @@
+---
 name: CI
 
-on: 
+on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
 jobs:
   lint-and-syntax:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -18,12 +17,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install ansible ansible-lint
-      
+
       - name: Install required collections
         run: ansible-galaxy collection install ansible.posix
 
@@ -34,7 +33,7 @@ jobs:
         run: ansible-playbook site.yml --syntax-check
 
       - name: Check mode (dry-run) against localhost
-        run: |
+        run: |-
           ansible-playbook site.yml \
             -i localhost, \
             --connection=local \
