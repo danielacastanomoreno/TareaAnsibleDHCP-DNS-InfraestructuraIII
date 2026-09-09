@@ -6,13 +6,13 @@
 
 - name: Determinar interfaz DHCP efectiva
   ansible.builtin.set_fact:
-    dhcp_interface_effective: "{{ dhcp_interface if (dhcp_interface | length > 0) else ansible_default_ipv4.interface }}"
+    dhcpd_interface_effective: "{{ dhcpd_interface if (dhcpd_interface | length > 0) else ansible_default_ipv4.interface }}"
 
 - name: Fijar interfaz en /etc/sysconfig/dhcpd (mecanismo soportado por dhcpd.service en RHEL9)
   ansible.builtin.lineinfile:
     path: /etc/sysconfig/dhcpd
     regexp: '^DHCPDARGS='
-    line: 'DHCPDARGS="{{ dhcp_interface_effective }}"'
+    line: 'DHCPDARGS="{{ dhcpd_interface_effective }}"'
     create: true
     owner: root
     group: root
@@ -38,7 +38,7 @@
     permanent: true
     immediate: true
     state: enabled
-  when: manage_firewalld | bool
+  when: dhcpd_manage_firewalld | bool
 
 - name: Habilitar e iniciar dhcpd
   ansible.builtin.service:

@@ -48,7 +48,7 @@
 
 - name: Comprobar estado de SELinux
   ansible.builtin.command: getenforce
-  register: selinux_status
+  register: dns_bind_selinux_status
   changed_when: false
   check_mode: false
 

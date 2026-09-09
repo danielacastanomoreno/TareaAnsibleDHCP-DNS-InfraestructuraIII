@@ -1,4 +1,4 @@
 ---
-- name: reactivar conexion de red
+- name: Reactivar conexion de red
   ansible.builtin.command: "nmcli connection up {{ client_interface }}"
   changed_when: true

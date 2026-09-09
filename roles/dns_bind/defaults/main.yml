@@ -1,14 +1,14 @@
 ---
-domain_name: castanomor.local
-dns_server_hostname: dhcpdnsdaniela
-dns_server_ip: 192.168.56.107
-reverse_zone: 56.168.192.in-addr.arpa
-dns_forwarders_enabled: true
-dns_forwarders: [8.8.8.8, 1.1.1.1]
-dns_recursion: true
-dns_allow_query: ["any"]
-dns_listen_on: ["any"]
-dns_serial: 2026090901
-dns_records_a: []
-dns_records_ptr: []
-manage_firewalld: true
+dns_bind_domain_name: castanomor.local
+dns_bind_server_hostname: dhcpdnsdaniela
+dns_bind_server_ip: 192.168.56.107
+dns_bind_reverse_zone: 56.168.192.in-addr.arpa
+dns_bind_forwarders_enabled: true
+dns_bind_forwarders: [8.8.8.8, 1.1.1.1]
+dns_bind_recursion: true
+dns_bind_allow_query: ["any"]
+dns_bind_listen_on: ["any"]
+dns_bind_serial: 2026090901
+dns_bind_records_a: []
+dns_bind_records_ptr: []
+dns_bind_manage_firewalld: true

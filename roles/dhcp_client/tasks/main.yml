@@ -30,8 +30,8 @@
   notify: reactivar conexion de red
 
 - name: Verificar que la interfaz ya no tiene IP fija asignada manualmente
-  ansible.builtin.command: "nmcli -g ipv4.method connection show {{ client_interface }}"
-  register: nmcli_method
+  ansible.builtin.command: "dhcp_client_nmcli -g ipv4.method connection show {{ client_interface }}"
+  register: dhcp_client_nmcli_method
   changed_when: false
 
 - name: Confirmar método DHCP aplicado

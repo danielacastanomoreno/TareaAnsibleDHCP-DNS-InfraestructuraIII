@@ -1,9 +1,9 @@
 ---
-dhcp_interface: ""
-dhcp_domain_name: "{{ domain_name }}"
-dhcp_domain_name_servers: []
-dhcp_default_lease_time: 600
-dhcp_max_lease_time: 7200
-dhcp_subnets: []
-dhcp_reservations: []
-manage_firewalld: true
+dhcpd_interface: ""
+dhcpd_domain_name: "{{ domain_name }}"
+dhcpd_domain_name_servers: []
+dhcpd_default_lease_time: 600
+dhcpd_max_lease_time: 7200
+dhcpd_subnets: []
+dhcpd_reservations: []
+dhcpd_manage_firewalld: true
