@@ -1,7 +1,10 @@
 ---
-# DNS (rol dns_bind)
-domain_name: "danielacastmor.local"
-dns_server_hostname: "dns1"
+# Domain and Network
+domain_name: "castanomor.local"
+reverse_zone: "56.168.192.in-addr.arpa" 
+
+# DNS (dns_bind role)
+dns_server_hostname: "dnsdaniela"
 dns_server_ip: "192.168.56.109"
 reverse_zone: "56.168.192.in-addr.arpa" # Corresponse a 192.168.56.0/24
 
@@ -11,18 +14,23 @@ dns_forwarders:
   - 1.1.1.1
 
 dns_recursion: true
+
+# BIND / DNS
 dns_allow_query:
-  - "any"
+  - "127.0.0.1"
+  - "192.168.56.0/24"
 dns_listen_on:
-  - "any"
+  - "127.0.0.1"
+  - "{{ dns_server_ip }}"
 
 # Recomended serial: YYYYMMDDnn
 dns_serial: "2026090801"
 
+# Type A of records
 dns_records_a:
-  - name: dns1
+  - name: dnsdaniela
   - ip: 192.168.56.109
-  - name: dhcp1
+  - name: dhcpdaniela
   - ip: 192.168.56.107
   - name: host1
   - ip: 192.168.56.110
@@ -31,23 +39,22 @@ dns_records_a:
 
 dns_records_ptr:
   - ip_last_octet: 109
-    hostname: dns1
+    hostname: dnsdaniela
   - ip_last_octet: 110
     hostname: host1
   - ip_last_octet: 111
     hostname: host2
 
-# DHCP (rol dhcp)
+# DHCP (dhcp role)
 # If there is no defined or empty, the interface is autodetected by the role
 # through ansible_default_ipv4.interface
-dhcp_interface: ""
-
+dhcp_authoritative: true
+dhcp_default_lease_time: 600
+dhcp_max_lease_time: 7200
 dhcp_domain_name: "{{ domain_name }}"
 dhcp_domain_name_servers:
   - "{{ dns_server_ip }}"
-
-dhcp_default_lease_time: 600
-dhcp_max_lease_time: 7200
+dhcp_interface: "enp0s9"
 
 dhcp_subnets:
   - network: 192.168.56.0

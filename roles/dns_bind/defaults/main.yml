@@ -1,8 +1,15 @@
 ---
-dns_bind_domain_name: "danielacastmor.local"
-dns_bind_server_hostname: "dns1"
+dns_bind_domain_name: "castanomor.local"
+dns_bind_server_hostname: "dnsdaniela"
 dns_bind_server_ip: "192.168.56.109"
 dns_bind_reverse_zone: "56.168.192.in-addr.arpa" # Corresponse a 192.168.56.0/24
+
+dns_bind_package: bind
+dns_bind_utils_package: bind-utils
+
+named_conf_path: /etc/named.conf
+named_zones_dir: /var/named
+named_service: named
 
 dns_bind_forwarders_enabled: true
 dns_bind_forwarders: []
@@ -13,13 +20,6 @@ dns_bind_listen_on:
   - "any"
 
 dns_bind_serial: "2026090801"
-
 dns_bind_records_a: []
-dns_bind_records_ptr: []
-dns_bind_conf_dir: /etc/named
-dns_bind_zones_dir: /var/named
-dns_bind_named_conf_path: /etc/named.conf
-dns_bind_zone_forward_file: "{{ bind_zones_dir }}/{{ domain_name }}.zone"
-dns_bind_zone_reverse_file: "{{ bind_zones_dir }}/{{ reverse_zone }}.zone"
-
-dns_bind_manage_firewalld: true
+firewall_enabled: true
+selinux_manage: true
