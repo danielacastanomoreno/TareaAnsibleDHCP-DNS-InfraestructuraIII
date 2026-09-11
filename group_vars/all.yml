@@ -29,9 +29,9 @@ dns_bind_records_ptr:
 
 # ---------- DHCP ----------
 dhcpd_interface: ""        # vacío = autodetección vía ansible_default_ipv4.interface
-dhcpd_domain_name: "{{ domain_name }}"
+dhcpd_domain_name: "{{ dns_bind_domain_name }}"
 dhcpd_domain_name_servers:
-  - "{{ dns_server_ip }}"
+  - "{{ dns_bind_server_ip }}"
 
 dhcpd_default_lease_time: 600
 dhcpd_max_lease_time: 7200

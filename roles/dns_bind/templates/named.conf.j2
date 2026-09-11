@@ -1,5 +1,5 @@
 options {
-    listen-on port 53 { {{ dns_listen_on | join('; ') }}; };
+    listen-on port 53 { {{ dns_bind_listen_on | join('; ') }}; };
     listen-on-v6 port 53 { none; };
     directory       "/var/named";
     allow-query     { {{ dns_allow_query | join('; ') }}; };
