@@ -4,7 +4,7 @@
     name: named
     state: stopped
     enabled: false
-  when: dhcpd_disable_local_server_services | bool
+  when: dhcpd_client_disable_local_server_services | bool
   failed_when: false
 
 - name: Detener y deshabilitar dhcpd si estaba presente en esta VM
@@ -12,7 +12,7 @@
     name: dhcpd
     state: stopped
     enabled: false
-  when: dhcpd_disable_local_server_services | bool
+  when: dhcpd_client_disable_local_server_services | bool
   failed_when: false
 
 - name: Comprobar si existe un archivo ifcfg legacy para la interfaz
