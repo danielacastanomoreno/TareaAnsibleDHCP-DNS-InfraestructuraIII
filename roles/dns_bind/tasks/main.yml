@@ -8,7 +8,7 @@
 
 - name: Desplegar named.conf (validado al escribir)
   ansible.builtin.template:
-    src: roles/dns_bind/templates/named.conf.j2
+    src: named.conf.j2
     dest: /etc/named.conf
     owner: root
     group: named
@@ -18,7 +18,7 @@
 
 - name: Desplegar zona forward
   ansible.builtin.template:
-    src: roles/dns_bind/templates/zone.forward.j2
+    src: zone.forward.j2
     dest: "/var/named/{{ domain_name }}.zone"
     owner: root
     group: named
@@ -27,7 +27,7 @@
 
 - name: Desplegar zona reverse
   ansible.builtin.template:
-    src: roles/dns_bind/templates/zone.reverse.j2
+    src: zone.reverse.j2
     dest: "/var/named/{{ reverse_zone }}.zone"
     owner: root
     group: named
@@ -48,7 +48,7 @@
 
 - name: Comprobar estado de SELinux
   ansible.builtin.command: getenforce
-  register: dns_bind_selinux_status
+  register: dns_bind_selinux_status.stdout
   changed_when: false
   check_mode: false
 
