@@ -46,7 +46,7 @@ dhcp_subnets:
 
 # Reserva la IP del cliente por MAC: evita que otro host reciba esa IP
 # y mantiene consistente el inventario de Ansible tras pasar el cliente a DHCP.
-dhcp_reservations:
+dhcp_reservations: 
   #- name: client1
   #  mac: "08:00:27:AA:BB:CC"   # EJEMPLO: reemplazar por la MAC real del cliente
   #  ip: 192.168.56.50
