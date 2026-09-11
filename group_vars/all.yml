@@ -46,7 +46,7 @@ dhcpd_subnets:
 
 # Reserva la IP del cliente por MAC: evita que otro host reciba esa IP
 # y mantiene consistente el inventario de Ansible tras pasar el cliente a DHCP.
-dhcpd_reservations: []
+dhcpd_reservations:
   - name: client1
     mac: "08:00:27:5E:B4:B2"   
     ip: 192.168.56.109
