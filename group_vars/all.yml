@@ -54,5 +54,5 @@ dhcpd_reservations: []
 dhcpd_manage_firewalld: true
 
 # ---------- Cliente DHCP ----------
-dhcp_client_interface: enp0s9        
-dhcp_disable_local_server_services: true
+dhcpd_client_interface: enp0s9        
+dhcpd_client_disable_local_server_services: true
