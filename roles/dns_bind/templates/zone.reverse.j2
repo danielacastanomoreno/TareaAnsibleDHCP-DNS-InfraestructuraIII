@@ -8,7 +8,7 @@ $TTL 86400
 
         IN  NS    {{ dns_bind_server_hostname }}.{{ dns_bind_domain_name }}.
 
-{{ dns_server_ip.split('.')[-1] }}     IN  PTR   {{ dns_bind_dns_server_hostname }}.{{ dns_bind_domain_name }}.
-{% for record in dns_records_ptr %}
+{{ dns_bind_server_ip.split('.')[-1] }}     IN  PTR   {{ dns_bind_dns_server_hostname }}.{{ dns_bind_domain_name }}.
+{% for record in dns_bind_records_ptr %}
 {{ record.ip_last_octet }}     IN  PTR   {{ record.hostname }}.{{ dns_bind_domain_name }}.
 {% endfor %}
