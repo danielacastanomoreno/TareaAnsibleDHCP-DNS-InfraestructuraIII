@@ -27,13 +27,13 @@
   notify: reactivar conexion de red
 
 - name: Verificar que la interfaz ya no tiene IP fija asignada manualmente
-  ansible.builtin.command: "dhcpd_client_nmcli -g ipv4.method connection show {{ dhcp_client_interface }}"
+  ansible.builtin.command: "dhcp_client_nmcli -g ipv4.method connection show {{ dhcp_client_interface }}"
   register: dhcp_client_nmcli_method
   changed_when: false
 
 - name: Confirmar método DHCP aplicado
   ansible.builtin.assert:
     that:
-      - "'auto' in dhcp_nmcli_method.stdout"
+      - "'auto' in dhcp_client_nmcli_method.stdout"
     fail_msg: "La conexión {{ dhcp_client_interface }} sigue en modo estático."
     success_msg: "Conexión {{ dhcp_client_interface }} en modo DHCP (auto)."
