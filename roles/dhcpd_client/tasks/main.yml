@@ -39,4 +39,41 @@
   changed_when: true
 
 - name: Limpiar IP estática residual del perfil
-  ansible.builtin.command: "nmcli connection modify {{
+  ansible.builtin.command:
+    argv:
+      - nmcli
+      - connection
+      - modify
+      - "{{ dhcpd_client_interface }}"
+      - ipv4.addresses
+      - ""
+  when: "'auto' not in dhcpd_client_current_method.stdout"
+  changed_when: true
+
+- name: Forzar reactivación de la conexión (solo si hubo cambio real)
+  ansible.builtin.command: "nmcli connection up {{ dhcpd_client_interface }}"
+  when: dhcpd_client_nmcli_change is changed
+  changed_when: true
+
+- name: Reiniciar NetworkManager solo si se retiró un ifcfg legacy o cambió el perfil
+  ansible.builtin.service:
+    name: NetworkManager
+    state: restarted
+  when: dhcpd_client_ifcfg_legacy.stat.exists or dhcpd_client_nmcli_change is changed
+
+- name: Esperar a que la interfaz aplique el nuevo método antes de verificar
+  ansible.builtin.pause:
+    seconds: 3
+  when: dhcpd_client_nmcli_change is changed
+
+- name: Verificar que la interfaz ya no tiene IP fija asignada manualmente
+  ansible.builtin.command: "nmcli -g ipv4.method connection show {{ dhcpd_client_interface }}"
+  register: dhcpd_client_nmcli_method
+  changed_when: false
+
+- name: Confirmar método DHCP aplicado
+  ansible.builtin.assert:
+    that:
+      - "'auto' in dhcpd_client_nmcli_method.stdout"
+    fail_msg: "La conexión {{ dhcpd_client_interface }} sigue en modo estático."
+    success_msg: "Conexión {{ dhcpd_client_interface }} en modo DHCP (auto)."
