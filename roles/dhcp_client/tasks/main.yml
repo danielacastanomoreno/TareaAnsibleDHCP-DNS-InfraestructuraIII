@@ -15,7 +15,7 @@
     name: dhcpd
     state: stopped
     enabled: false
-  when: disable_local_server_services | bool
+  when: dhcpd_disable_local_server_services | bool
   failed_when: false
 
 # Requiere: ansible-galaxy collection install community.general
