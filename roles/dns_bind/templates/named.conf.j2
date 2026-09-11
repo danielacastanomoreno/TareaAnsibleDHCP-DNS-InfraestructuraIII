@@ -22,9 +22,9 @@ zone "." IN {
     file "named.ca";
 };
 
-zone "{{ domain_name }}" IN {
+zone "{{ dns_bind_domain_name }}" IN {
     type master;
-    file "{{ domain_name }}.zone";
+    file "{{ dns_bind_domain_name }}.zone";
     allow-update { none; };
 };
 
