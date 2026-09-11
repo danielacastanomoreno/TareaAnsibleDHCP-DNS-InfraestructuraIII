@@ -5,7 +5,7 @@
 - name: Detener y deshabilitar named si estaba presente en esta VM
   ansible.builtin.service:
     name: named
-    state: stopped
+    state: stoppedmcli
     enabled: false
   when: dhcpd_disable_local_server_services | bool
   failed_when: false
@@ -30,7 +30,7 @@
   notify: reactivar conexion de red
 
 - name: Verificar que la interfaz ya no tiene IP fija asignada manualmente
-  ansible.builtin.command: "dhcp_client_nmcli -g ipv4.method connection show {{ dhcp_client_interface }}"
+  ansible.builtin.command: "dhcpd_client_nmcli -g ipv4.method connection show {{ dhcpd_client_interface }}"
   register: dhcpd_client_nmcli_method
   changed_when: false
 
@@ -38,5 +38,5 @@
   ansible.builtin.assert:
     that:
       - "'auto' in nmcli_method.stdout"
-    fail_msg: "La conexión {{ dhcp_client_interface }} sigue en modo estático."
-    success_msg: "Conexión {{ dhcp_client_interface }} en modo DHCP (auto)."
+    fail_msg: "La conexión {{ dhcpd_client_interface }} sigue en modo estático."
+    success_msg: "Conexión {{ dhcpd_client_interface }} en modo DHCP (auto)."
