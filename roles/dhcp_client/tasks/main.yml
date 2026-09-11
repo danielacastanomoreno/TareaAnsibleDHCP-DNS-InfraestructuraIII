@@ -57,6 +57,19 @@
   register: dhcp_client_nmcli_method
   changed_when: false
 
+- name: Cambiar la conexión de red de IP estática a DHCP (method=auto)
+  community.general.nmcli:
+    conn_name: "{{ dhcp_client_interface }}"
+    ifname: "{{ dhcp_client_interface }}"
+    type: ethernet
+    method4: auto
+    ip4: null
+    gw4: null
+    method6: disabled
+    autoconnect: true
+    state: present
+  register: dhcp_client_nmcli_change
+
 - name: Confirmar método DHCP aplicado
   ansible.builtin.assert:
     that:
