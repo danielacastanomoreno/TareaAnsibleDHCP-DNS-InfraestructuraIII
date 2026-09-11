@@ -28,9 +28,9 @@ zone "{{ dns_bind_domain_name }}" IN {
     allow-update { none; };
 };
 
-zone "{{ reverse_zone }}" IN {
+zone "{{ dns_bind_reverse_zone }}" IN {
     type master;
-    file "{{ reverse_zone }}.zone";
+    file "{{ dns_bind_reverse_zone }}.zone";
     allow-update { none; };
 };
 
