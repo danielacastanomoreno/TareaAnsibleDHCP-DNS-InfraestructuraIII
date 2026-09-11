@@ -10,4 +10,4 @@
   hosts: dhcp_clients
   become: true
   roles:
-    - dhcp_client
+    - dhcpd_client
