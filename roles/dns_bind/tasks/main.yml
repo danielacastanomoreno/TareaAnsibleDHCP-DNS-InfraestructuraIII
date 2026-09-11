@@ -48,14 +48,14 @@
 
 - name: Comprobar estado de SELinux
   ansible.builtin.command: getenforce
-  register: dns_bind_selinux_status.stdout
+  register: dns_bind_selinux_status
   changed_when: false
   check_mode: false
 
 - name: Restaurar contexto SELinux en /var/named
   ansible.builtin.command: restorecon -Rv /var/named
   changed_when: false
-  when: "'Disabled' not in dns_bind_selinux_status.stdout"
+  when: "'Disabled' not in dns_bind_selinux_status"
 
 - name: Abrir servicio DNS en firewalld
   ansible.posix.firewalld:
