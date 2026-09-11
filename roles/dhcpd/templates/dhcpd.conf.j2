@@ -1,12 +1,12 @@
 authoritative;
 
-default-lease-time {{ dhcp_default_lease_time }};
-max-lease-time {{ dhcp_max_lease_time }};
+default-lease-time {{ dhcpd_default_lease_time }};
+max-lease-time {{ dhcpd_max_lease_time }};
 
-option domain-name "{{ dhcp_domain_name }}";
-option domain-name-servers {{ dhcp_domain_name_servers | join(', ') }};
+option domain-name "{{ dhcpd_domain_name }}";
+option domain-name-servers {{ dhcpd_domain_name_servers | join(', ') }};
 
-{% for subnet in dhcp_subnets %}
+{% for subnet in dhcpd_subnets %}
 subnet {{ subnet.network }} netmask {{ subnet.netmask }} {
     range {{ subnet.range_start }} {{ subnet.range_end }};
     option routers {{ subnet.routers }};
@@ -14,7 +14,7 @@ subnet {{ subnet.network }} netmask {{ subnet.netmask }} {
 }
 {% endfor %}
 
-{% for host in dhcp_reservations %}
+{% for host in dhcpd_reservations %}
 host {{ host.name }} {
     hardware ethernet {{ host.mac }};
     fixed-address {{ host.ip }};

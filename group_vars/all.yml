@@ -1,42 +1,42 @@
 ---
 # ---------- DNS ----------
-domain_name: castanomor.local
-dns_server_hostname: dhcpdnsdaniela
-dns_server_ip: 192.168.56.107
-reverse_zone: 56.168.192.in-addr.arpa
+dns_bind_domain_name: castanomor.local
+dns_bind_server_hostname: dhcpdnsdaniela
+dns_bind_server_ip: 192.168.56.107
+dns_bind_reverse_zone: 56.168.192.in-addr.arpa
 
-dns_forwarders_enabled: true
-dns_forwarders:
+dns_bind_forwarders_enabled: true
+dns_bind_forwarders:
   - 8.8.8.8
   - 1.1.1.1
 
-dns_recursion: true
-dns_allow_query:
+dns_bind_recursion: true
+dns_bind_allow_query:
   - "192.168.56.0/24"
-dns_listen_on:
+dns_bind_listen_on:
   - "192.168.56.107"
   - "127.0.0.1"
 
-dns_serial: 2026090901   # YYYYMMDDnn
+dns_bind_serial: 2026090901   # YYYYMMDDnn
 
-dns_records_a:
+dns_bind_records_a:
   - name: client1
     ip: 192.168.56.50
 
-dns_records_ptr:
+dns_bind_records_ptr:
   - ip_last_octet: "50"
     hostname: client1
 
 # ---------- DHCP ----------
-dhcp_interface: ""        # vacío = autodetección vía ansible_default_ipv4.interface
-dhcp_domain_name: "{{ domain_name }}"
-dhcp_domain_name_servers:
+dhcpd_interface: ""        # vacío = autodetección vía ansible_default_ipv4.interface
+dhcpd_domain_name: "{{ domain_name }}"
+dhcpd_domain_name_servers:
   - "{{ dns_server_ip }}"
 
-dhcp_default_lease_time: 600
-dhcp_max_lease_time: 7200
+dhcpd_default_lease_time: 600
+dhcpd_max_lease_time: 7200
 
-dhcp_subnets:
+dhcpd_subnets:
   - network: 192.168.56.0
     netmask: 255.255.255.0
     range_start: 192.168.56.100
@@ -46,12 +46,12 @@ dhcp_subnets:
 
 # Reserva la IP del cliente por MAC: evita que otro host reciba esa IP
 # y mantiene consistente el inventario de Ansible tras pasar el cliente a DHCP.
-dhcp_reservations: 
+dhcpd_reservations: []
   #- name: client1
   #  mac: "08:00:27:AA:BB:CC"   # EJEMPLO: reemplazar por la MAC real del cliente
   #  ip: 192.168.56.50
 
-manage_firewalld: true
+dhcpd_manage_firewalld: true
 
 # ---------- Cliente DHCP ----------
 client_interface: enp0s9        # EJEMPLO: ajustar a la NIC real de la VM cliente
