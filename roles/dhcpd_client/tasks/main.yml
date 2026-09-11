@@ -4,7 +4,7 @@
     name: named
     state: stopped
     enabled: false
-  when: dhcpd_disable_local_server_services | bool
+  when: dhcpd_client_disable_local_server_services | bool
   failed_when: false
 
 - name: Detener y deshabilitar dhcpd si estaba presente en esta VM
@@ -12,30 +12,30 @@
     name: dhcpd
     state: stopped
     enabled: false
-  when: dhcpd_disable_local_server_services | bool
+  when: dhcpd_client_disable_local_server_services | bool
   failed_when: false
 
 - name: Comprobar si existe un archivo ifcfg legacy para la interfaz
   ansible.builtin.stat:
-    path: "/etc/sysconfig/network-scripts/ifcfg-{{ dhcpd_client_interface }}"
-  register: dhcpd_client_ifcfg_legacy
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ dhcp_client_interface }}"
+  register: dhcp_client_ifcfg_legacy
 
 - name: Respaldar y retirar ifcfg legacy si existe
   ansible.builtin.command: >
-    mv /etc/sysconfig/network-scripts/ifcfg-{{ dhcpd_client_interface }}
-    /root/ifcfg-{{ dhcpd_client_interface }}.bak
-  when: dhcpd_client_ifcfg_legacy.stat.exists
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ dhcp_client_interface }}
+    /root/ifcfg-{{ dhcp_client_interface }}.bak
+  when: dhcp_client_ifcfg_legacy.stat.exists
   changed_when: true
 
 - name: Verificar el método IPv4 actual de la conexión
-  ansible.builtin.command: "nmcli -g ipv4.method connection show {{ dhcpd_client_interface }}"
-  register: dhcpd_client_current_method
+  ansible.builtin.command: "nmcli -g ipv4.method connection show {{ dhcp_client_interface }}"
+  register: dhcp_client_current_method
   changed_when: false
 
 - name: Cambiar el método de la conexión a DHCP (auto)
-  ansible.builtin.command: "nmcli connection modify {{ dhcpd_client_interface }} ipv4.method auto"
-  when: "'auto' not in dhcpd_client_current_method.stdout"
-  register: dhcpd_client_nmcli_change
+  ansible.builtin.command: "nmcli connection modify {{ dhcp_client_interface }} ipv4.method auto"
+  when: "'auto' not in dhcp_client_current_method.stdout"
+  register: dhcp_client_nmcli_change
   changed_when: true
 
 - name: Limpiar IP estática residual del perfil
@@ -44,36 +44,36 @@
       - nmcli
       - connection
       - modify
-      - "{{ dhcpd_client_interface }}"
+      - "{{ dhcp_client_interface }}"
       - ipv4.addresses
       - ""
-  when: "'auto' not in dhcpd_client_current_method.stdout"
+  when: "'auto' not in dhcp_client_current_method.stdout"
   changed_when: true
 
 - name: Forzar reactivación de la conexión (solo si hubo cambio real)
-  ansible.builtin.command: "nmcli connection up {{ dhcpd_client_interface }}"
-  when: dhcpd_client_nmcli_change is changed
+  ansible.builtin.command: "nmcli connection up {{ dhcp_client_interface }}"
+  when: dhcp_client_nmcli_change is changed
   changed_when: true
 
 - name: Reiniciar NetworkManager solo si se retiró un ifcfg legacy o cambió el perfil
   ansible.builtin.service:
     name: NetworkManager
     state: restarted
-  when: dhcpd_client_ifcfg_legacy.stat.exists or dhcpd_client_nmcli_change is changed
+  when: dhcp_client_ifcfg_legacy.stat.exists or dhcp_client_nmcli_change is changed
 
 - name: Esperar a que la interfaz aplique el nuevo método antes de verificar
   ansible.builtin.pause:
     seconds: 3
-  when: dhcpd_client_nmcli_change is changed
+  when: dhcp_client_nmcli_change is changed
 
 - name: Verificar que la interfaz ya no tiene IP fija asignada manualmente
-  ansible.builtin.command: "nmcli -g ipv4.method connection show {{ dhcpd_client_interface }}"
-  register: dhcpd_client_nmcli_method
+  ansible.builtin.command: "nmcli -g ipv4.method connection show {{ dhcp_client_interface }}"
+  register: dhcp_client_nmcli_method
   changed_when: false
 
 - name: Confirmar método DHCP aplicado
   ansible.builtin.assert:
     that:
-      - "'auto' in dhcpd_client_nmcli_method.stdout"
-    fail_msg: "La conexión {{ dhcpd_client_interface }} sigue en modo estático."
-    success_msg: "Conexión {{ dhcpd_client_interface }} en modo DHCP (auto)."
+      - "'auto' in dhcp_client_nmcli_method.stdout"
+    fail_msg: "La conexión {{ dhcp_client_interface }} sigue en modo estático."
+    success_msg: "Conexión {{ dhcp_client_interface }} en modo DHCP (auto)."
