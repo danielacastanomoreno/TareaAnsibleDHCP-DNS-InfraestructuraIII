@@ -21,8 +21,8 @@
 # Requiere: ansible-galaxy collection install community.general
 - name: Cambiar la conexión de red de IP estática a DHCP (method=auto)
   community.general.nmcli:
-    conn_name: "{{ client_interface }}"
-    ifname: "{{ client_interface }}"
+    conn_name: "{{ dhcp_client_interface }}"
+    ifname: "{{ dhcp_client_interface }}"
     type: ethernet
     method4: auto
     method6: disabled
@@ -30,7 +30,7 @@
   notify: reactivar conexion de red
 
 - name: Verificar que la interfaz ya no tiene IP fija asignada manualmente
-  ansible.builtin.command: "dhcp_client_nmcli -g ipv4.method connection show {{ client_interface }}"
+  ansible.builtin.command: "dhcp_client_nmcli -g ipv4.method connection show {{ dhcp_client_interface }}"
   register: dhcp_client_nmcli_method
   changed_when: false
 
@@ -38,5 +38,5 @@
   ansible.builtin.assert:
     that:
       - "'auto' in nmcli_method.stdout"
-    fail_msg: "La conexión {{ client_interface }} sigue en modo estático."
-    success_msg: "Conexión {{ client_interface }} en modo DHCP (auto)."
+    fail_msg: "La conexión {{ dhcp_client_interface }} sigue en modo estático."
+    success_msg: "Conexión {{ dhcp_client_interface }} en modo DHCP (auto)."
