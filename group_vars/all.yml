@@ -48,11 +48,11 @@ dhcpd_subnets:
 # y mantiene consistente el inventario de Ansible tras pasar el cliente a DHCP.
 dhcpd_reservations: []
   #- name: client1
-  #  mac: "08:00:27:AA:BB:CC"   # EJEMPLO: reemplazar por la MAC real del cliente
+  #  mac: "08:00:27:AA:BB:CC"   
   #  ip: 192.168.56.50
 
 dhcpd_manage_firewalld: true
 
 # ---------- Cliente DHCP ----------
-client_interface: enp0s9        # EJEMPLO: ajustar a la NIC real de la VM cliente
-disable_local_server_services: true
+dhcpd_client_interface: enp0s9        
+dhcpd_disable_local_server_services: true
