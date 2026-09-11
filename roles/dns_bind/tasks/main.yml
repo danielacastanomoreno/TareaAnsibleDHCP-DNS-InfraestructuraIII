@@ -8,7 +8,7 @@
 
 - name: Desplegar named.conf (validado al escribir)
   ansible.builtin.template:
-    src: named.conf.j2
+    src: /templates/named.conf.j2
     dest: /etc/named.conf
     owner: root
     group: named
@@ -18,7 +18,7 @@
 
 - name: Desplegar zona forward
   ansible.builtin.template:
-    src: zone.forward.j2
+    src: /templates/zone.forward.j2
     dest: "/var/named/{{ domain_name }}.zone"
     owner: root
     group: named
@@ -27,7 +27,7 @@
 
 - name: Desplegar zona reverse
   ansible.builtin.template:
-    src: zone.reverse.j2
+    src: /templates/zone.reverse.j2
     dest: "/var/named/{{ reverse_zone }}.zone"
     owner: root
     group: named
