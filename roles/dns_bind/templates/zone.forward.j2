@@ -1,14 +1,14 @@
 $TTL 86400
-@   IN  SOA   {{ dns_server_hostname }}.{{ domain_name }}. admin.{{ domain_name }}. (
-        {{ dns_serial }} ; Serial
+@   IN  SOA   {{ dns_bind_server_hostname }}.{{ dns_bind_domain_name }}. admin.{{ dns_bind_domain_name }}. (
+        {{ dns_bind_serial }} ; Serial
         3600       ; Refresh
         1800       ; Retry
         604800     ; Expire
         86400 )    ; Minimum TTL
 
-        IN  NS    {{ dns_server_hostname }}.{{ domain_name }}.
+        IN  NS    {{ dns_bind_server_hostname }}.{{ dns_bind_domain_name }}.
 
-{{ dns_server_hostname }}      IN  A   {{ dns_server_ip }}
-{% for record in dns_records_a %}
+{{ dns_bind_server_hostname }}      IN  A   {{ dns_bind_server_ip }}
+{% for record in dns_bind_records_a %}
 {{ record.name }}      IN  A   {{ record.ip }}
 {% endfor %}

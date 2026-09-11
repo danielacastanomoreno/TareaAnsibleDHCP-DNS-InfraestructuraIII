@@ -2,10 +2,10 @@ options {
     listen-on port 53 { {{ dns_bind_listen_on | join('; ') }}; };
     listen-on-v6 port 53 { none; };
     directory       "/var/named";
-    allow-query     { {{ dns_allow_query | join('; ') }}; };
+    allow-query     { {{ dns_bind__allow_query | join('; ') }}; };
     recursion {{ 'yes' if dns_recursion else 'no' }};
-{% if dns_forwarders_enabled %}
-    forwarders { {{ dns_forwarders | join('; ') }}; };
+{% if dns_bind_forwarders_enabled %}
+    forwarders { {{ dns_bind_forwarders | join('; ') }}; };
 {% endif %}
     dnssec-validation auto;
 };
