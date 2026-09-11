@@ -55,7 +55,7 @@
 - name: Restaurar contexto SELinux en /var/named
   ansible.builtin.command: restorecon -Rv /var/named
   changed_when: false
-  when: "'Disabled' not in selinux_status.stdout"
+  when: "'Disabled' not in dns_bind_selinux_status.stdout"
 
 - name: Abrir servicio DNS en firewalld
   ansible.posix.firewalld:
