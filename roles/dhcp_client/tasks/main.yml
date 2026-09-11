@@ -37,6 +37,6 @@
 - name: Confirmar método DHCP aplicado
   ansible.builtin.assert:
     that:
-      - "'auto' in nmcli_method.stdout"
+      - "'auto' in dhcpd_nmcli_method.stdout"
     fail_msg: "La conexión {{ dhcpd_client_interface }} sigue en modo estático."
     success_msg: "Conexión {{ dhcpd_client_interface }} en modo DHCP (auto)."
